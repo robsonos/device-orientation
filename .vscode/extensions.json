@@ -1,0 +1,17 @@
+{
+  "recommendations": [
+    "adam-bender.commit-message-editor",
+    "angular.ng-template",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "gruntfuggly.todo-tree",
+    "mpotthoff.vscode-android-webview-debug",
+    "nisargjhaveri.ios-debug",
+    "redhat.java",
+    "redhat.vscode-xml",
+    "streetsidesoftware.code-spell-checker",
+    "streetsidesoftware.code-spell-checker-australian-english",
+    "vknabel.vscode-swiftformat",
+    "vscjava.vscode-java-pack"
+  ]
+}

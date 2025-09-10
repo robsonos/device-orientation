@@ -1,0 +1,9 @@
+{
+  "projectName": "capacitor-community-device-orientation",
+  "projectOwner": "ronsonos",
+  "commit": true,
+  "linkToUsage": true,
+  "skipCi": true,
+  "repoType": "github",
+  "commitConvention": "angular"
+}
