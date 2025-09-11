@@ -1,12 +1,19 @@
-## Created with Capacitor Create App
+# Device Orientation example App
 
-This app was created using [`@capacitor/create-app`](https://github.com/ionic-team/create-capacitor-app),
-and comes with a very minimal shell for building an app.
+This app was created using [Ionic](https://ionicframework.com/), [Angular](https://angular.dev/) and [CapacitorJS](https://capacitorjs.com/).
 
-### Running this example
+# Running this example
 
-To run the provided example, you can use `npm start` command.
+To run the example, you can use [`ionic serve`](https://ionicframework.com/docs/cli/commands/serve) command.
 
-```bash
-npm start
+```shell
+ionic serve
+```
+
+# Running this example on native platform
+
+To run the example on a native platform, use check out the [`ionic capacitor run`](https://ionicframework.com/docs/cli/commands/capacitor-run) command. For instance:
+
+```shell
+ ionic cap run android -l --external --target=<Target ID>
 ```

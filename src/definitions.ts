@@ -11,6 +11,8 @@ export interface Orientation {
    * device is pointing towards the north, the reported heading is ideally 0 degrees, towards east is 90 degrees, south
    * is 180 degrees and west is 270 degrees. Note that the heading may deviate from its ideal value because of local
    * magnetic disturbances or an uncalibrated magnetometer sensor.
+   *
+   * @since 7.0.0
    */
   heading: number;
 
@@ -20,6 +22,8 @@ export interface Orientation {
    * This value represents the angle between a plane parallel to the device's screen and a plane parallel to the
    * ground. Assuming that the bottom edge of the device faces the user and that the screen is face-up, tilting the top
    * edge of the device toward the ground creates a positive pitch angle.
+   *
+   * @since 7.0.0
    */
   pitch: number;
 
@@ -42,6 +46,8 @@ export interface Orientation {
    * percentile confidence begins to break down, ultimately becoming meaningless when there is no knowledge of the
    * heading. Thus, when 180 degrees is reported it is no longer the 95th percentile confidence interval but instead a
    * declaration of complete ignorance of the true heading.
+   *
+   * @since 7.0.0
    */
   headingError: number;
 }
@@ -61,17 +67,15 @@ export interface OrientationOptions {
    * sources are unavailable.
    *
    * Available options:
-   * - `'default'`:
-   *   - 50Hz / 20ms period.
-   *   - Recommended for users looking for a trade-off between lower battery usage and frequent orientation updates.
-   * - `'fast'`
-   *   - 200Hz / 5ms period.
-   *   - This higher update is for users requiring a higher level of precision, at the cost of battery usage.
-   * - '`medium`'
-   *   - 100Hz / 10ms period.
-   *   - This higher update frequency is for users requiring a higher level of precision, at the cost of battery usage.
+   * - `'default'`: 50Hz / 20ms period, Recommended for users looking for a trade-off between lower battery usage and
+   * frequent orientation updates.
+   * - `'fast'`: 200Hz / 5ms period. This higher update is for users requiring a higher level of precision, at the cost
+   * of battery usage.
+   * - '`medium`': 100Hz / 10ms period. This higher update frequency is for users requiring a higher level of
+   * precision, at the cost of battery usage.
    *
    * @default 'default'
+   * @since 7.0.0
    */
   frequency: 'medium' | 'fast' | 'default';
 }
@@ -83,6 +87,11 @@ export interface DeviceOrientationPlugin {
    * @param callback Options for the watch.
    * @param options Options for the watch.
    * @returns A promise that resolves with a watch ID.
+   * @example
+   * const watchId = await DeviceOrientation.watchOrientation((position) => {
+   *   console.log(position);
+   * });
+   * @since 7.0.0
    */
   watchOrientation(callback: OrientationWatchCallback, options?: OrientationOptions): Promise<string>;
 
@@ -90,6 +99,9 @@ export interface DeviceOrientationPlugin {
    * Remove a watch listener by its ID.
    *
    * @param watchId The watch ID to clear.
+   * @example
+   * DeviceOrientation.clearWatch(watchId);
+   * @since 7.0.0
    */
   clearWatch(watchId: string): Promise<void>;
 }
