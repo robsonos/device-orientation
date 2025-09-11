@@ -51,7 +51,7 @@ export interface Orientation {
  */
 export type OrientationWatchCallback = (orientation: Orientation | null, err?: any) => void;
 
-export interface WatchOptions {
+export interface OrientationOptions {
   /**
    * Specifies the desired frequency for orientation updates.
    *
@@ -84,7 +84,7 @@ export interface DeviceOrientationPlugin {
    * @param options Options for the watch.
    * @returns A promise that resolves with a watch ID.
    */
-  watchOrientation(callback: OrientationWatchCallback, options?: WatchOptions): Promise<string>;
+  watchOrientation(callback: OrientationWatchCallback, options?: OrientationOptions): Promise<string>;
 
   /**
    * Remove a watch listener by its ID.

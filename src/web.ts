@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { WebPlugin } from '@capacitor/core';
 
-import type { DeviceOrientationPlugin, Orientation, OrientationWatchCallback, WatchOptions } from './definitions';
+import type { DeviceOrientationPlugin, Orientation, OrientationWatchCallback, OrientationOptions } from './definitions';
 
 export class DeviceOrientationWeb extends WebPlugin implements DeviceOrientationPlugin {
   private watchHandlers = new Map<string, (event: DeviceOrientationEvent) => void>();
 
-  async watchOrientation(callback: OrientationWatchCallback, _options?: WatchOptions): Promise<string> {
+  async watchOrientation(callback: OrientationWatchCallback, _options?: OrientationOptions): Promise<string> {
     if (
       typeof DeviceMotionEvent === 'undefined' ||
       // @ts-expect-error ignore

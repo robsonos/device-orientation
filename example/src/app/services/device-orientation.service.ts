@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
-import type { Orientation, WatchOptions } from 'capacitor-community-device-orientation';
-import { DeviceOrientation } from 'capacitor-community-device-orientation';
+import { type Orientation, type OrientationOptions, DeviceOrientation } from 'capacitor-community-device-orientation';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DeviceOrientationService {
-  watchOrientationObservable(options: WatchOptions): Observable<Orientation | null> {
+  watchOrientationObservable(options: OrientationOptions): Observable<Orientation | null> {
     return new Observable<Orientation | null>((observer) => {
       let watchId: string | null = null;
 
