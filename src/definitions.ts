@@ -55,7 +55,7 @@ export interface Orientation {
 /**
  * Callback for the watchOrientation method.
  */
-export type OrientationWatchCallback = (orientation: Orientation | null, err?: any) => void;
+export type OrientationWatchCallback = (orientation: Orientation, err?: any) => void;
 
 export interface OrientationOptions {
   /**
