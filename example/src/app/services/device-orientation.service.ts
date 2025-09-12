@@ -6,8 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class DeviceOrientationService {
-  watchOrientationObservable(options: OrientationOptions): Observable<Orientation | null> {
-    return new Observable<Orientation | null>((observer) => {
+  watchOrientationObservable(options: OrientationOptions): Observable<Orientation> {
+    return new Observable<Orientation>((observer) => {
       let watchId: string | null = null;
 
       // Start watching

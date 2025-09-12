@@ -41,44 +41,52 @@ public class DeviceOrientationPlugin extends Plugin {
         DeviceOrientationListener listener = deviceOrientation -> call
                 .resolve(DeviceOrientation.getOrientationJSObject(deviceOrientation));
 
-        implementation.watchOrientation(samplingPeriodMicros, listener, executor);
+        implementation.watchOrientation(samplingPeriodMicros, listener, executor, call);
         watchingListeners.put(call.getCallbackId(), listener);
     }
 
     @PluginMethod
     public void clearWatch(PluginCall call) {
         String callbackId = call.getString("watchId");
-        if (callbackId != null) {
-            DeviceOrientationListener listener = watchingListeners.remove(callbackId);
-            if (listener != null) {
-                implementation.clearWatch(listener);
-            }
 
-            watchingCalls.remove(callbackId);
-
-            PluginCall savedCall = bridge.getSavedCall(callbackId);
-            if (savedCall != null) {
-                savedCall.release(bridge);
-            }
+        if (callbackId == null || callbackId.isEmpty()) {
+            call.reject(DeviceOrientationErrors.WATCH_ID_NOT_PROVIDED.message,
+                    DeviceOrientationErrors.WATCH_ID_NOT_PROVIDED.code);
+            return;
         }
+
+        DeviceOrientationListener listener = watchingListeners.get(callbackId);
+
+        if (listener == null) {
+            call.reject(DeviceOrientationErrors.WATCH_ID_NOT_FOUND.message,
+                    DeviceOrientationErrors.WATCH_ID_NOT_FOUND.code);
+            return;
+        }
+
+        watchingListeners.remove(callbackId);
+        implementation.clearWatch(listener);
+        watchingCalls.remove(callbackId);
+
+        PluginCall savedCall = bridge.getSavedCall(callbackId);
+        if (savedCall != null) {
+            savedCall.release(bridge);
+        }
+
         call.resolve();
     }
 
     @Override
     protected void handleOnPause() {
         super.handleOnPause();
-
         for (DeviceOrientationListener listener : watchingListeners.values()) {
             implementation.clearWatch(listener);
         }
-
         watchingListeners.clear();
     }
 
     @Override
     protected void handleOnResume() {
         super.handleOnResume();
-
         for (PluginCall call : watchingCalls.values()) {
             startWatch(call);
         }

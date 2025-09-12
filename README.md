@@ -152,10 +152,24 @@ Represents the physical orientation of the device.
 Callback for the watchOrientation method.
 
 <code>
-  (orientation: <a href="#orientation">Orientation</a> | null, err?: any): void
+  (orientation: <a href="#orientation">Orientation</a>, err?: any): void
 </code>
 
 </docgen-api>
+
+### Errors
+
+The plugin returns specific errors with specific codes on native Android. Web does not follow this standard for errors.
+
+The following table list all the plugin errors:
+
+| Error code    | Platform(s) | Message                               |
+| ------------- | ----------- | ------------------------------------- |
+| DEV-ORI--0001 | Android     | Could not start orientation listener. |
+| DEV-ORI--0002 | Android     | WatchId not found.                    |
+| DEV-ORI--0003 | Android     | WatchId needs to be provided.         |
+
+There was en error trying to obtain the location.
 
 ## Contributors
 
