@@ -1,6 +1,6 @@
 {
   "name": "capacitor-community-device-orientation",
-  "version": "1.0.0",
+  "version": "6.0.0",
   "description": "Device orientation integration for Capacitor",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",

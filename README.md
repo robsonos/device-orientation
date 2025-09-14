@@ -71,6 +71,12 @@ npx cap sync
 
 Please check the sample permissions in [Android](./example/android/app/src/main/AndroidManifest.xml) and [iOS](./example/ios/App/App/Info.plist) folders.
 
+- **Android**: No permissions are required. The output rate on Android is limited to 200Hz on devices running API level 31 (Android S) or higher, unless the android.permissions. `HIGH_SAMPLING_RATE_SENSORS` permission was added to your Manifest.xml.
+
+## Power consideration
+
+Always request the longest update period (lowest frequency) that is sufficient for your use case. While more frequent updates can be required for high precision tasks (for example Augmented Reality), it comes with a power cost. If you do not know which update period to use, we recommend starting with `'default'` period as it fits most client needs.
+
 ## API
 
 <docgen-index>
@@ -88,64 +94,137 @@ Please check the sample permissions in [Android](./example/android/app/src/main/
 ### watchOrientation(...)
 
 ```typescript
-watchOrientation(callback: OrientationWatchCallback, options?: WatchOptions | undefined) => Promise<string>
+watchOrientation(callback: DeviceOrientationWatchCallback, options?: DeviceOrientationOptions | undefined) => Promise<DeviceOrientationCallbackID>
 ```
 
-Set up a listener to continuously receive orientation updates.
+Set up a listener to continuously receive device orientation updates.
 
-| Param          | Type                                                                          | Description            |
-| -------------- | ----------------------------------------------------------------------------- | ---------------------- |
-| **`callback`** | <code><a href="#orientationwatchcallback">OrientationWatchCallback</a></code> | Options for the watch. |
-| **`options`**  | <code><a href="#watchoptions">WatchOptions</a></code>                         | Options for the watch. |
+On **Android**, this API returns a complete <a href="#deviceorientationdata">`DeviceOrientationData`</a> object, including
+`fused` heading and `attitude` quaternion data from the FusedOrientationProviderClient
+for high accuracy.
+
+On the **Web**, this API returns a partial <a href="#deviceorientationdata">`DeviceOrientationData`</a> object containing
+only the `orientation` property (azimuth, pitch, roll) from the standard
+DeviceOrientationEvent API. The `fused` and `attitude` properties will be undefined.
+On iOS 13+, this will first prompt the user for permission.
+
+| Param          | Type                                                                                      | Description                                               |
+| -------------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| **`callback`** | <code><a href="#deviceorientationwatchcallback">DeviceOrientationWatchCallback</a></code> | The function to call when a new orientation is available. |
+| **`options`**  | <code><a href="#deviceorientationoptions">DeviceOrientationOptions</a></code>             | Options for configuring the watch.                        |
 
 **Returns:** <code>Promise&lt;string&gt;</code>
+
+**Since:** 7.0.0
 
 ---
 
 ### clearWatch(...)
 
 ```typescript
-clearWatch(watchId: string) => Promise<void>
+clearWatch(options: DeviceOrientationClearWatchOptions) => Promise<void>
 ```
 
 Remove a watch listener by its ID.
 
-| Param         | Type                | Description            |
-| ------------- | ------------------- | ---------------------- |
-| **`watchId`** | <code>string</code> | The watch ID to clear. |
+| Param         | Type                                                                                              | Description                                                 |
+| ------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| **`options`** | <code><a href="#deviceorientationclearwatchoptions">DeviceOrientationClearWatchOptions</a></code> | The options object containing the ID of the watch to clear. |
+
+**Since:** 7.0.0
 
 ---
 
 ### Interfaces
 
+#### DeviceOrientationData
+
+A comprehensive object containing all available orientation data from a single device event.
+
+| Prop              | Type                                                          | Description                                                                             | Since |
+| ----------------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ----- |
+| **`orientation`** | <code><a href="#orientation">Orientation</a></code>           | The device's orientation expressed in Euler angles. This is available on all platforms. | 7.0.0 |
+| **`fused`**       | <code><a href="#fusedorientation">FusedOrientation</a></code> | The fused heading data, which includes corrections for True North.                      | 7.0.0 |
+| **`attitude`**    | <code><a href="#attitude">Attitude</a></code>                 | The raw attitude data as a quaternion.                                                  | 7.0.0 |
+
 #### Orientation
 
-Represents the physical orientation of the device.
+Euler angles (Azimuth, Pitch, Roll) calculated from the raw device attitude.
 
-| Prop               | Type                | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| ------------------ | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`heading`**      | <code>number</code> | The estimated heading of the device in degrees (0° to 360°) The heading of the device is defined as the direction where the top of the device is pointing, assuming that the user is looking at the phone's screen and the phone is in hand. The heading is estimated clockwise from the true north when magnetic declination is available, and clockwise from the magnetic north otherwise. Therefore, when the device is pointing towards the north, the reported heading is ideally 0 degrees, towards east is 90 degrees, south is 180 degrees and west is 270 degrees. Note that the heading may deviate from its ideal value because of local magnetic disturbances or an uncalibrated magnetometer sensor.                                                                                                          |
-| **`pitch`**        | <code>number</code> | Angle of rotation about the -x axis in degrees (-90° to 90°). This value represents the angle between a plane parallel to the device's screen and a plane parallel to the ground. Assuming that the bottom edge of the device faces the user and that the screen is face-up, tilting the top edge of the device toward the ground creates a positive pitch angle.                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| **`roll`**         | <code>number</code> | Angle of rotation about the y axis in degrees (-180° to 180). This value represents the angle between a plane perpendicular to the device's screen and a plane perpendicular to the ground. Assuming that the bottom edge of the device faces the user and that the screen is face-up, tilting the right edge of the device toward the ground creates a positive roll angle.                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| **`headingError`** | <code>number</code> | The estimated error in the reported heading of the device in degrees (0° to 180). The reported error represents half the error cone. For example a value of 10.0 corresponds to a true heading between -10.0 degrees and 10.0 degrees around the heading output. This method returns 180 in the case that the estimated heading error is invalid. The error cone corresponds to two sigma error for small angles, which is approximately the 95th percentile two-sided confidence interval. For large angles, the concept of a 95th percentile confidence begins to break down, ultimately becoming meaningless when there is no knowledge of the heading. Thus, when 180 degrees is reported it is no longer the 95th percentile confidence interval but instead a declaration of complete ignorance of the true heading. |
+| Prop          | Type                | Description                                                                                                                                                                                                                  | Since |
+| ------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **`azimuth`** | <code>number</code> | The angle of rotation about the -z axis, in degrees. This value represents the angle between the device's y-axis and the magnetic north pole. On Android, the range is [-180, 180]. On the Web (iOS), the range is [0, 360]. | 7.0.0 |
+| **`pitch`**   | <code>number</code> | The angle of rotation about the -x axis, in degrees. This value represents the angle between a plane parallel to the device's screen and a plane parallel to the ground. On Android, the range is [-90, 90].                 | 7.0.0 |
+| **`roll`**    | <code>number</code> | The angle of rotation about the y-axis, in degrees. This value represents the angle between a plane perpendicular to the device's screen and a plane perpendicular to the ground. On Android, the range is [-180, 180].      | 7.0.0 |
 
-#### WatchOptions
+#### FusedOrientation
 
-| Prop            | Type                                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Default                |
-| --------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
-| **`frequency`** | <code>'default' \| 'medium' \| 'fast'</code> | Specifies the desired frequency for orientation updates. This setting influences how often your application receives orientation data, directly affecting power consumption. The actual update rate is not guaranteed and may vary depending on device capabilities, system load, or other applications' requests. In some cases, updates may be delivered at a different rate or not at all if orientation sources are unavailable. Available options: - `'default'`: - 50Hz / 20ms period. - Recommended for users looking for a trade-off between lower battery usage and frequent orientation updates. - `'fast'` - 200Hz / 5ms period. - This higher update is for users requiring a higher level of precision, at the cost of battery usage. - '`medium`' - 100Hz / 10ms period. - This higher update frequency is for users requiring a higher level of precision, at the cost of battery usage. | <code>'default'</code> |
+High-level, filtered heading data from the fused orientation provider.
+
+| Prop               | Type                | Description                                                                                                 | Since |
+| ------------------ | ------------------- | ----------------------------------------------------------------------------------------------------------- | ----- |
+| **`heading`**      | <code>number</code> | The estimated heading of the device in degrees from [0, 360), aiming for True North when possible.          | 7.0.0 |
+| **`headingError`** | <code>number</code> | The estimated error in the reported heading in degrees, from [0, 180]. This represents half the error cone. | 7.0.0 |
+
+#### Attitude
+
+The raw attitude of the device represented as a quaternion.
+
+| Prop             | Type                                              | Description                                                              | Since |
+| ---------------- | ------------------------------------------------- | ------------------------------------------------------------------------ | ----- |
+| **`quaternion`** | <code><a href="#quaternion">Quaternion</a></code> | The device's attitude, represented as a rotation vector in a quaternion. | 7.0.0 |
+
+#### DeviceOrientationOptions
+
+Options for configuring the orientation watch.
+
+| Prop            | Type                                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Default                | Since |
+| --------------- | -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ----- |
+| **`frequency`** | <code>'default' \| 'medium' \| 'fast'</code> | The desired frequency of updates. - `'default'`: 50Hz / 20ms period, Recommended for users looking for a trade-off between lower battery usage and frequent orientation updates. - `'fast'`: 200Hz / 5ms period. This higher update is for users requiring a higher level of precision, at the cost of battery usage. - '`medium`': 100Hz / 10ms period. This higher update frequency is for users requiring a higher level of precision, at the cost of battery usage. | <code>'default'</code> | 7.0.0 |
+
+#### DeviceOrientationClearWatchOptions
+
+Options for the clearWatch method.
+
+| Prop     | Type                                                                                | Description                                              | Since |
+| -------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------- | ----- |
+| **`id`** | <code><a href="#deviceorientationcallbackid">DeviceOrientationCallbackID</a></code> | The callback ID returned by `watchOrientation` to clear. | 7.0.0 |
 
 ### Type Aliases
 
-#### OrientationWatchCallback
+#### DeviceOrientationWatchCallback
 
-Callback for the watchOrientation method.
+The callback function to be invoked on each orientation update.
 
 <code>
-  (orientation: <a href="#orientation">Orientation</a> | null, err?: any): void
+  (orientation: <a href="#deviceorientationdata">DeviceOrientationData</a>, err?: any): void
 </code>
 
+#### Quaternion
+
+A 4-element array representing the [qx, qy, qz, qw] components of a quaternion.
+
+<code>[qx: number, qy: number, qz: number, qw: number]</code>
+
+#### DeviceOrientationCallbackID
+
+A string identifier for a registered watch callback.
+
+<code>string</code>
+
 </docgen-api>
+
+### Errors
+
+The plugin returns specific errors with specific codes on native Android. Web does not follow this standard for errors. The following table list all the plugin errors:
+
+| Error code   | Platform(s) | Message                               |
+| ------------ | ----------- | ------------------------------------- |
+| DEV-ORI-0001 | Android     | Could not start orientation listener. |
+| DEV-ORI-0002 | Android     | WatchId not found.                    |
+| DEV-ORI-0003 | Android     | WatchId needs to be provided.         |
+
+There was en error trying to obtain the location.
 
 ## Contributors
 

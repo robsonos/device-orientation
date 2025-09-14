@@ -1,14 +1,17 @@
 import { Injectable } from '@angular/core';
-import type { Orientation, WatchOptions } from 'capacitor-community-device-orientation';
-import { DeviceOrientation } from 'capacitor-community-device-orientation';
+import {
+  type DeviceOrientationData,
+  type DeviceOrientationOptions,
+  DeviceOrientation,
+} from 'capacitor-community-device-orientation';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DeviceOrientationService {
-  watchOrientationObservable(options: WatchOptions): Observable<Orientation | null> {
-    return new Observable<Orientation | null>((observer) => {
+  watchOrientationObservable(options: DeviceOrientationOptions): Observable<DeviceOrientationData> {
+    return new Observable<DeviceOrientationData>((observer) => {
       let watchId: string | null = null;
 
       // Start watching
@@ -25,7 +28,7 @@ export class DeviceOrientationService {
       // Teardown logic
       return () => {
         if (watchId !== null) {
-          DeviceOrientation.clearWatch(watchId).catch((error) => {
+          DeviceOrientation.clearWatch({ id: watchId }).catch((error) => {
             // Optionally log or handle cleanup errors
             console.warn('Failed to clear watch:', error);
           });

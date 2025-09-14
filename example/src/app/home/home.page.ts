@@ -1,7 +1,16 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, JsonPipe } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel } from '@ionic/angular/standalone';
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonItemDivider,
+} from '@ionic/angular/standalone';
 
 import { DeviceOrientationService } from '../services/device-orientation.service';
 
@@ -10,18 +19,25 @@ import { DeviceOrientationService } from '../services/device-orientation.service
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [IonLabel, IonItem, IonList, IonHeader, IonToolbar, IonTitle, IonContent, DecimalPipe],
+  imports: [
+    IonItemDivider,
+    IonLabel,
+    IonItem,
+    IonList,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    DecimalPipe,
+    JsonPipe,
+  ],
 })
 export class HomePage {
   private readonly deviceOrientationService = inject(DeviceOrientationService);
-  orientation = toSignal(this.deviceOrientationService.watchOrientationObservable({ frequency: 'default' }));
-
-  headingError = computed(() => {
-    return this.orientation()?.headingError;
-  });
+  deviceOrientation = toSignal(this.deviceOrientationService.watchOrientationObservable({ frequency: 'default' }));
 
   headingAccuracy = computed(() => {
-    const headingError = this.headingError();
+    const headingError = this.deviceOrientation()?.fused?.headingError;
 
     if (headingError == null || headingError < 0) {
       return 'UNKNOWN';
