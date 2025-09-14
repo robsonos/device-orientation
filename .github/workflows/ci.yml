@@ -5,83 +5,83 @@ on:
       - dev
 
 jobs:
-  # lint:
-  #   runs-on: macos-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 1
+  lint:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version-file: '.nvmrc'
-  #         cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
 
-  #     - name: Install dependencies
-  #       run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-  #     - name: Install SwiftLint
-  #       run: |
-  #         brew install swiftlint
+      - name: Install SwiftLint
+        run: |
+          brew install swiftlint
 
-  #     - name: Lint
-  #       run: npm run lint
+      - name: Lint
+        run: npm run lint
 
-  # build-example:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 1
+  build-example:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version-file: '.nvmrc'
-  #         cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
 
-  #     - name: Install plugin dependencies
-  #       run: npm ci
+      - name: Install plugin dependencies
+        run: npm ci
 
-  #     - name: Build plugin
-  #       run: npm run build
+      - name: Build plugin
+        run: npm run build
 
-  #     - name: Install example dependencies
-  #       run: npm ci
-  #       working-directory: example
+      - name: Install example dependencies
+        run: npm ci
+        working-directory: example
 
-  #     - name: Build example
-  #       run: npm run build
-  #       working-directory: example
+      - name: Build example
+        run: npm run build
+        working-directory: example
 
-  # verify-android:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 1
+  verify-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version-file: '.nvmrc'
-  #         cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
 
-  #     - name: Install dependencies
-  #       run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-  #     - name: Setup Java
-  #       uses: actions/setup-java@v4
-  #       with:
-  #         distribution: 'jetbrains'
-  #         java-version-file: '.java-version'
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'jetbrains'
+          java-version-file: '.java-version'
 
-  #     - name: Verify
-  #       run: npm run verify:android
+      - name: Verify
+        run: npm run verify:android
 
   # verify-ios:
   #   runs-on: macos-latest
@@ -105,7 +105,7 @@ jobs:
 
   verify-release:
     runs-on: ubuntu-latest
-    # needs: [lint, verify-android, build-example] # verify-ios
+    needs: [lint, verify-android, build-example] # verify-ios
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -126,15 +126,15 @@ jobs:
         run: |
           rm .releaserc.js
 
-          DRY_RUN_OUTPUT=$(npx semantic-release --branches dev --dry-run)
+          DRY_RUN_OUTPUT=$(npx semantic-release --branches dev --dry-run 2>&1 || true)
           echo "$DRY_RUN_OUTPUT"
 
-          RELEASE_VERSION=$(echo "$DRY_RUN_OUTPUT" | grep -oP 'The next release version is \K\d+\.\d+\.\d+')
+          RELEASE_VERSION=$(echo "$DRY_RUN_OUTPUT" | grep -oP 'The next release version is \K\d+\.\d+\.\d+' || echo "")
           echo "$RELEASE_VERSION"
 
           if [ -z "$RELEASE_VERSION" ]; then
             echo "No new version detected."
-            echo "release_version=null" >> $GITHUB_OUTPUT
+            echo "release_version=" >> $GITHUB_OUTPUT
           else
             echo "Detected version: $RELEASE_VERSION"
             echo "release_version=$RELEASE_VERSION" >> $GITHUB_OUTPUT

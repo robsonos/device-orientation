@@ -1,12 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { WebPlugin } from '@capacitor/core';
 
-import type { DeviceOrientationPlugin, Orientation, OrientationWatchCallback, OrientationOptions } from './definitions';
+import type {
+  DeviceOrientationPlugin,
+  DeviceOrientationData,
+  DeviceOrientationWatchCallback,
+  DeviceOrientationOptions,
+  DeviceOrientationClearWatchOptions,
+  DeviceOrientationCallbackID,
+} from './definitions';
 
 export class DeviceOrientationWeb extends WebPlugin implements DeviceOrientationPlugin {
   private watchHandlers = new Map<string, (event: DeviceOrientationEvent) => void>();
 
-  async watchOrientation(callback: OrientationWatchCallback, _options?: OrientationOptions): Promise<string> {
+  async watchOrientation(
+    callback: DeviceOrientationWatchCallback,
+    _options?: DeviceOrientationOptions,
+  ): Promise<DeviceOrientationCallbackID> {
     if (
       typeof DeviceMotionEvent === 'undefined' ||
       // @ts-expect-error ignore
@@ -24,16 +34,17 @@ export class DeviceOrientationWeb extends WebPlugin implements DeviceOrientation
     }
   }
 
-  private startWatch(callback: OrientationWatchCallback): string {
+  private startWatch(callback: DeviceOrientationWatchCallback): string {
     const watchId = this.generateWatchId();
     const handler = (event: DeviceOrientationEvent) => {
-      const orientation: Orientation = {
-        heading: event.alpha || 0,
-        pitch: event.beta || 0,
-        roll: event.gamma || 0,
-        headingError: 180,
+      const deviceOrientation: DeviceOrientationData = {
+        orientation: {
+          azimuth: event.alpha ?? 0,
+          pitch: event.beta ?? 0,
+          roll: event.gamma ?? 0,
+        },
       };
-      callback(orientation);
+      callback(deviceOrientation);
     };
 
     window.addEventListener('deviceorientation', handler);
@@ -41,11 +52,11 @@ export class DeviceOrientationWeb extends WebPlugin implements DeviceOrientation
     return watchId;
   }
 
-  async clearWatch(watchId: string): Promise<void> {
-    const handler = this.watchHandlers.get(watchId);
+  async clearWatch(options: DeviceOrientationClearWatchOptions): Promise<void> {
+    const handler = this.watchHandlers.get(options.id);
     if (handler) {
       window.removeEventListener('deviceorientation', handler);
-      this.watchHandlers.delete(watchId);
+      this.watchHandlers.delete(options.id);
     }
   }
 

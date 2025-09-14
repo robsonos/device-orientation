@@ -1,51 +1,61 @@
 /**
- * Represents the physical orientation of the device.
+ * A 4-element array representing the [qx, qy, qz, qw] components of a quaternion.
+ *
+ * @since 7.0.0
+ */
+export type Quaternion = [qx: number, qy: number, qz: number, qw: number];
+
+/**
+ * Euler angles (Azimuth, Pitch, Roll) calculated from the raw device attitude.
+ *
+ * @since 7.0.0
  */
 export interface Orientation {
   /**
-   * The estimated heading of the device in degrees (0° to 360°)
-   *
-   * The heading of the device is defined as the direction where the top of the device is pointing, assuming that the
-   * user is looking at the phone's screen and the phone is in hand. The heading is estimated clockwise from the true
-   * north when magnetic declination is available, and clockwise from the magnetic north otherwise. Therefore, when the
-   * device is pointing towards the north, the reported heading is ideally 0 degrees, towards east is 90 degrees, south
-   * is 180 degrees and west is 270 degrees. Note that the heading may deviate from its ideal value because of local
-   * magnetic disturbances or an uncalibrated magnetometer sensor.
+   * The angle of rotation about the -z axis, in degrees. This value represents
+   * the angle between the device's y-axis and the magnetic north pole.
+   * On Android, the range is [-180, 180]. On the Web (iOS), the range is [0, 360].
    *
    * @since 7.0.0
    */
-  heading: number;
-
+  azimuth: number;
   /**
-   * Angle of rotation about the -x axis in degrees (-90° to 90°).
-   *
-   * This value represents the angle between a plane parallel to the device's screen and a plane parallel to the
-   * ground. Assuming that the bottom edge of the device faces the user and that the screen is face-up, tilting the top
-   * edge of the device toward the ground creates a positive pitch angle.
+   * The angle of rotation about the -x axis, in degrees. This value represents
+   * the angle between a plane parallel to the device's screen and a plane
+   * parallel to the ground.
+   * On Android, the range is [-90, 90].
    *
    * @since 7.0.0
    */
   pitch: number;
-
   /**
-   * Angle of rotation about the y axis in degrees (-180° to 180).
+   * The angle of rotation about the y-axis, in degrees. This value represents
+   * the angle between a plane perpendicular to the device's screen and a
+   * plane perpendicular to the ground.
+   * On Android, the range is [-180, 180].
    *
-   * This value represents the angle between a plane perpendicular to the device's screen and a plane perpendicular to
-   * the ground. Assuming that the bottom edge of the device faces the user and that the screen is face-up, tilting the
-   * right edge of the device toward the ground creates a positive roll angle.
+   * @since 7.0.0
    */
   roll: number;
+}
 
+/**
+ * High-level, filtered heading data from the fused orientation provider.
+ *
+ * @platform android
+ * @since 7.0.0
+ */
+export interface FusedOrientation {
   /**
-   * The estimated error in the reported heading of the device in degrees (0° to 180).
+   * The estimated heading of the device in degrees from [0, 360), aiming for
+   * True North when possible.
    *
-   * The reported error represents half the error cone. For example a value of 10.0 corresponds to a true heading
-   * between -10.0 degrees and 10.0 degrees around the heading output. This method returns 180 in the case that the
-   * estimated heading error is invalid. The error cone corresponds to two sigma error for small angles, which is
-   * approximately the 95th percentile two-sided confidence interval. For large angles, the concept of a 95th
-   * percentile confidence begins to break down, ultimately becoming meaningless when there is no knowledge of the
-   * heading. Thus, when 180 degrees is reported it is no longer the 95th percentile confidence interval but instead a
-   * declaration of complete ignorance of the true heading.
+   * @since 7.0.0
+   */
+  heading: number;
+  /**
+   * The estimated error in the reported heading in degrees, from [0, 180].
+   * This represents half the error cone.
    *
    * @since 7.0.0
    */
@@ -53,20 +63,63 @@ export interface Orientation {
 }
 
 /**
- * Callback for the watchOrientation method.
+ * The raw attitude of the device represented as a quaternion.
+ *
+ * @platform android
+ * @since 7.0.0
  */
-export type OrientationWatchCallback = (orientation: Orientation, err?: any) => void;
-
-export interface OrientationOptions {
+export interface Attitude {
   /**
-   * Specifies the desired frequency for orientation updates.
+   * The device's attitude, represented as a rotation vector in a quaternion.
    *
-   * This setting influences how often your application receives orientation data, directly affecting power consumption.
-   * The actual update rate is not guaranteed and may vary depending on device capabilities, system load, or other
-   * applications' requests. In some cases, updates may be delivered at a different rate or not at all if orientation
-   * sources are unavailable.
+   * @since 7.0.0
+   */
+  quaternion: Quaternion;
+}
+
+/**
+ * A comprehensive object containing all available orientation data from a single device event.
+ *
+ * @since 7.0.0
+ */
+export interface DeviceOrientationData {
+  /**
+   * The device's orientation expressed in Euler angles. This is available on all platforms.
    *
-   * Available options:
+   * @since 7.0.0
+   */
+  orientation: Orientation;
+  /**
+   * The fused heading data, which includes corrections for True North.
+   *
+   * @platform android
+   * @since 7.0.0
+   */
+  fused?: FusedOrientation;
+  /**
+   * The raw attitude data as a quaternion.
+   *
+   * @platform android
+   * @since 7.0.0
+   */
+  attitude?: Attitude;
+}
+
+/**
+ * The callback function to be invoked on each orientation update.
+ *
+ * @since 7.0.0
+ */
+export type DeviceOrientationWatchCallback = (orientation: DeviceOrientationData, err?: any) => void;
+
+/**
+ * Options for configuring the orientation watch.
+ *
+ * @since 7.0.0
+ */
+export interface DeviceOrientationOptions {
+  /**
+   * The desired frequency of updates.
    * - `'default'`: 50Hz / 20ms period, Recommended for users looking for a trade-off between lower battery usage and
    * frequent orientation updates.
    * - `'fast'`: 200Hz / 5ms period. This higher update is for users requiring a higher level of precision, at the cost
@@ -80,28 +133,65 @@ export interface OrientationOptions {
   frequency: 'medium' | 'fast' | 'default';
 }
 
+/**
+ * A string identifier for a registered watch callback.
+ *
+ * @since 7.0.0
+ */
+export type DeviceOrientationCallbackID = string;
+
+/**
+ * Options for the clearWatch method.
+ *
+ * @since 7.0.0
+ */
+export interface DeviceOrientationClearWatchOptions {
+  /**
+   * The callback ID returned by `watchOrientation` to clear.
+   *
+   * @since 7.0.0
+   */
+  id: DeviceOrientationCallbackID;
+}
+
 export interface DeviceOrientationPlugin {
   /**
-   * Set up a listener to continuously receive orientation updates.
+   * Set up a listener to continuously receive device orientation updates.
    *
-   * @param callback Options for the watch.
-   * @param options Options for the watch.
-   * @returns A promise that resolves with a watch ID.
+   * On **Android**, this API returns a complete `DeviceOrientationData` object, including
+   * `fused` heading and `attitude` quaternion data from the FusedOrientationProviderClient
+   * for high accuracy.
+   *
+   * On the **Web**, this API returns a partial `DeviceOrientationData` object containing
+   * only the `orientation` property (azimuth, pitch, roll) from the standard
+   * DeviceOrientationEvent API. The `fused` and `attitude` properties will be undefined.
+   * On iOS 13+, this will first prompt the user for permission.
+   *
+   * @param callback The function to call when a new orientation is available.
+   * @param options Options for configuring the watch.
+   * @returns A promise that resolves with the callback ID of the watch.
    * @example
-   * const watchId = await DeviceOrientation.watchOrientation((position) => {
-   *   console.log(position);
+   * const watchId = await DeviceOrientation.watchOrientation((orientationData) => {
+   * console.log('Orientation:', orientationData.orientation);
+   * if (orientationData.fused) {
+   * console.log('Fused Heading:', orientationData.fused.heading);
+   * }
    * });
    * @since 7.0.0
    */
-  watchOrientation(callback: OrientationWatchCallback, options?: OrientationOptions): Promise<string>;
+  watchOrientation(
+    callback: DeviceOrientationWatchCallback,
+    options?: DeviceOrientationOptions,
+  ): Promise<DeviceOrientationCallbackID>;
 
   /**
    * Remove a watch listener by its ID.
    *
-   * @param watchId The watch ID to clear.
+   * @param options The options object containing the ID of the watch to clear.
+   * @returns A promise that resolves when the watch is successfully cleared.
    * @example
-   * DeviceOrientation.clearWatch(watchId);
+   * DeviceOrientation.clearWatch({ id: watchId });
    * @since 7.0.0
    */
-  clearWatch(watchId: string): Promise<void>;
+  clearWatch(options: DeviceOrientationClearWatchOptions): Promise<void>;
 }

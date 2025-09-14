@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@SuppressWarnings("unused")
 @CapacitorPlugin(name = "DeviceOrientation")
 public class DeviceOrientationPlugin extends Plugin {
 
@@ -39,7 +40,7 @@ public class DeviceOrientationPlugin extends Plugin {
         long samplingPeriodMicros = getOutputPeriod(call.getString("frequency", "default"));
 
         DeviceOrientationListener listener = deviceOrientation -> call
-                .resolve(DeviceOrientation.getOrientationJSObject(deviceOrientation));
+                .resolve(DeviceOrientation.getDeviceOrientationJSObject(deviceOrientation));
 
         implementation.watchOrientation(samplingPeriodMicros, listener, executor, call);
         watchingListeners.put(call.getCallbackId(), listener);
@@ -47,7 +48,7 @@ public class DeviceOrientationPlugin extends Plugin {
 
     @PluginMethod
     public void clearWatch(PluginCall call) {
-        String callbackId = call.getString("watchId");
+        String callbackId = call.getString("id");
 
         if (callbackId == null || callbackId.isEmpty()) {
             call.reject(DeviceOrientationErrors.WATCH_ID_NOT_PROVIDED.message,

@@ -11,6 +11,9 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.DeviceOrientationListener;
 import com.google.android.gms.location.DeviceOrientationRequest;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.util.concurrent.Executor;
 
 public class DeviceOrientation {
@@ -44,28 +47,44 @@ public class DeviceOrientation {
         fusedOrientationProviderClient.removeOrientationUpdates(listener);
     }
 
-    public static JSObject getOrientationJSObject(com.google.android.gms.location.DeviceOrientation deviceOrientation) {
+    public static JSObject getDeviceOrientationJSObject(
+            com.google.android.gms.location.DeviceOrientation deviceOrientation) {
         JSObject data = new JSObject();
 
-        float heading = deviceOrientation.getHeadingDegrees();
-        float headingError;
+        JSObject fusedData = new JSObject();
+        fusedData.put("heading", deviceOrientation.getHeadingDegrees());
         if (deviceOrientation.hasConservativeHeadingErrorDegrees()) {
-            headingError = deviceOrientation.getConservativeHeadingErrorDegrees();
+            fusedData.put("headingError", deviceOrientation.getConservativeHeadingErrorDegrees());
         } else {
-            headingError = deviceOrientation.getHeadingErrorDegrees();
+            fusedData.put("headingError", deviceOrientation.getHeadingErrorDegrees());
         }
+        data.put("fused", fusedData);
 
+        JSObject attitudeData = new JSObject();
+        JSObject orientationData = new JSObject();
+
+        float[] attitude = deviceOrientation.getAttitude();
         float[] rotationMatrix = new float[9];
         float[] orientationAngles = new float[3];
-        SensorManager.getRotationMatrixFromVector(rotationMatrix, deviceOrientation.getAttitude());
-        SensorManager.getOrientation(rotationMatrix, orientationAngles);
-        float pitch = (float) Math.toDegrees(orientationAngles[1]);
-        float roll = (float) Math.toDegrees(orientationAngles[2]);
 
-        data.put("heading", heading);
-        data.put("pitch", pitch);
-        data.put("roll", roll);
-        data.put("headingError", headingError);
+        SensorManager.getRotationMatrixFromVector(rotationMatrix, attitude);
+        SensorManager.getOrientation(rotationMatrix, orientationAngles);
+
+        orientationData.put("azimuth", Math.toDegrees(orientationAngles[0]));
+        orientationData.put("pitch", Math.toDegrees(orientationAngles[1]));
+        orientationData.put("roll", Math.toDegrees(orientationAngles[2]));
+        data.put("orientation", orientationData);
+
+        try {
+            JSONArray quaternionArray = new JSONArray();
+            for (float v : attitude) {
+                quaternionArray.put(v);
+            }
+            attitudeData.put("quaternion", quaternionArray);
+            data.put("attitude", attitudeData);
+        } catch (JSONException e) {
+            Log.e(TAG, "Could not serialize attitude data.", e);
+        }
 
         return data;
     }
