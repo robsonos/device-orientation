@@ -19,18 +19,7 @@ import { DeviceOrientationService } from '../services/device-orientation.service
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [
-    IonItemDivider,
-    IonLabel,
-    IonItem,
-    IonList,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    DecimalPipe,
-    JsonPipe,
-  ],
+  imports: [IonItemDivider, IonLabel, IonItem, IonList, IonHeader, IonToolbar, IonTitle, IonContent, DecimalPipe],
 })
 export class HomePage {
   private readonly deviceOrientationService = inject(DeviceOrientationService);
