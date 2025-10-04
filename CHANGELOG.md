@@ -1,3 +1,13 @@
+# [7.1.0](https://github.com/robsonos/device-orientation/compare/v7.0.0...v7.1.0) (2025-10-04)
+
+
+* Merge pull request #3 from robsonos/dev ([f13c736](https://github.com/robsonos/device-orientation/commit/f13c73642429d2e30b59bb2918dda346daf9e483)), closes [#3](https://github.com/robsonos/device-orientation/issues/3)
+
+
+### Features :sparkles:
+
+* add iOS implementation ([8415589](https://github.com/robsonos/device-orientation/commit/8415589842075084c081f1b009f276cbd05a8ea9))
+
 # [7.0.0](https://github.com/robsonos/device-orientation/compare/v6.0.0...v7.0.0) (2025-09-14)
 
 
