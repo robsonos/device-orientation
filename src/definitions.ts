@@ -14,7 +14,7 @@ export interface Orientation {
   /**
    * The angle of rotation about the -z axis, in degrees. This value represents
    * the angle between the device's y-axis and the magnetic north pole.
-   * On Android, the range is [-180, 180]. On the Web (iOS), the range is [0, 360].
+   * On Android, the range is [-180, 180]. On iOS (native and web), the range is [0, 360].
    *
    * @since 7.0.0
    */
@@ -65,7 +65,7 @@ export interface FusedOrientation {
 /**
  * The raw attitude of the device represented as a quaternion.
  *
- * @platform android
+ * @platform android, ios
  * @since 7.0.0
  */
 export interface Attitude {
@@ -99,7 +99,7 @@ export interface DeviceOrientationData {
   /**
    * The raw attitude data as a quaternion.
    *
-   * @platform android
+   * @platform android, ios
    * @since 7.0.0
    */
   attitude?: Attitude;
@@ -162,6 +162,9 @@ export interface DeviceOrientationPlugin {
    * `fused` heading and `attitude` quaternion data from the FusedOrientationProviderClient
    * for high accuracy.
    *
+   * On **iOS**, this API returns a `DeviceOrientationData` object containing `orientation`
+   * and `attitude` data. The `fused` property will be undefined.
+   *
    * On the **Web**, this API returns a partial `DeviceOrientationData` object containing
    * only the `orientation` property (azimuth, pitch, roll) from the standard
    * DeviceOrientationEvent API. The `fused` and `attitude` properties will be undefined.
@@ -175,6 +178,9 @@ export interface DeviceOrientationPlugin {
    * console.log('Orientation:', orientationData.orientation);
    * if (orientationData.fused) {
    * console.log('Fused Heading:', orientationData.fused.heading);
+   * }
+   * if (orientationData.attitude) {
+   * console.log('Quaternion:', orientationData.attitude.quaternion);
    * }
    * });
    * @since 7.0.0

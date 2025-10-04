@@ -4,7 +4,11 @@
     "angular.ng-template",
     "eamodio.gitlens",
     "esbenp.prettier-vscode",
+    "github.vscode-github-actions",
     "gruntfuggly.todo-tree",
+    "streetsidesoftware.code-spell-checker",
+    "swiftlang.swift-vscode",
+    "vscjava.vscode-java-pack",
     "mpotthoff.vscode-android-webview-debug",
     "nisargjhaveri.ios-debug",
     "redhat.java",
@@ -12,6 +16,7 @@
     "streetsidesoftware.code-spell-checker",
     "streetsidesoftware.code-spell-checker-australian-english",
     "vknabel.vscode-swiftformat",
-    "vscjava.vscode-java-pack"
+    "vscjava.vscode-java-pack",
+    "webnative.webnative"
   ]
 }

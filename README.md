@@ -73,6 +73,8 @@ Please check the sample permissions in [Android](./example/android/app/src/main/
 
 - **Android**: No permissions are required. The output rate on Android is limited to 200Hz on devices running API level 31 (Android S) or higher, unless the android.permissions. `HIGH_SAMPLING_RATE_SENSORS` permission was added to your Manifest.xml.
 
+- **iOS**: iOS requires the `NSMotionUsageDescription` key to be added to your app's `Info.plist` file.
+
 ## Power consideration
 
 Always request the longest update period (lowest frequency) that is sufficient for your use case. While more frequent updates can be required for high precision tasks (for example Augmented Reality), it comes with a power cost. If you do not know which update period to use, we recommend starting with `'default'` period as it fits most client needs.
@@ -102,6 +104,9 @@ Set up a listener to continuously receive device orientation updates.
 On **Android**, this API returns a complete <a href="#deviceorientationdata">`DeviceOrientationData`</a> object, including
 `fused` heading and `attitude` quaternion data from the FusedOrientationProviderClient
 for high accuracy.
+
+On **iOS**, this API returns a <a href="#deviceorientationdata">`DeviceOrientationData`</a> object containing `orientation`
+and `attitude` data. The `fused` property will be undefined.
 
 On the **Web**, this API returns a partial <a href="#deviceorientationdata">`DeviceOrientationData`</a> object containing
 only the `orientation` property (azimuth, pitch, roll) from the standard
@@ -151,11 +156,11 @@ A comprehensive object containing all available orientation data from a single d
 
 Euler angles (Azimuth, Pitch, Roll) calculated from the raw device attitude.
 
-| Prop          | Type                | Description                                                                                                                                                                                                                  | Since |
-| ------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| **`azimuth`** | <code>number</code> | The angle of rotation about the -z axis, in degrees. This value represents the angle between the device's y-axis and the magnetic north pole. On Android, the range is [-180, 180]. On the Web (iOS), the range is [0, 360]. | 7.0.0 |
-| **`pitch`**   | <code>number</code> | The angle of rotation about the -x axis, in degrees. This value represents the angle between a plane parallel to the device's screen and a plane parallel to the ground. On Android, the range is [-90, 90].                 | 7.0.0 |
-| **`roll`**    | <code>number</code> | The angle of rotation about the y-axis, in degrees. This value represents the angle between a plane perpendicular to the device's screen and a plane perpendicular to the ground. On Android, the range is [-180, 180].      | 7.0.0 |
+| Prop          | Type                | Description                                                                                                                                                                                                                         | Since |
+| ------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **`azimuth`** | <code>number</code> | The angle of rotation about the -z axis, in degrees. This value represents the angle between the device's y-axis and the magnetic north pole. On Android, the range is [-180, 180]. On iOS (native and web), the range is [0, 360]. | 7.0.0 |
+| **`pitch`**   | <code>number</code> | The angle of rotation about the -x axis, in degrees. This value represents the angle between a plane parallel to the device's screen and a plane parallel to the ground. On Android, the range is [-90, 90].                        | 7.0.0 |
+| **`roll`**    | <code>number</code> | The angle of rotation about the y-axis, in degrees. This value represents the angle between a plane perpendicular to the device's screen and a plane perpendicular to the ground. On Android, the range is [-180, 180].             | 7.0.0 |
 
 #### FusedOrientation
 
