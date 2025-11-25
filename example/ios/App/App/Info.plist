@@ -47,5 +47,7 @@
 		<true />
 		<key>NSMotionUsageDescription</key>
 		<string>This app uses device motion to provide orientation-based features.</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>This app requires location access to align the compass with True North.</string>
 	</dict>
 </plist>

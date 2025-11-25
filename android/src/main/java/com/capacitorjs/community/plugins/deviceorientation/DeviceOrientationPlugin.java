@@ -66,11 +66,10 @@ public class DeviceOrientationPlugin extends Plugin {
 
         watchingListeners.remove(callbackId);
         implementation.clearWatch(listener);
-        watchingCalls.remove(callbackId);
+        PluginCall removedCall = watchingCalls.remove(callbackId);
 
-        PluginCall savedCall = bridge.getSavedCall(callbackId);
-        if (savedCall != null) {
-            savedCall.release(bridge);
+        if (removedCall != null) {
+            removedCall.release(bridge);
         }
 
         call.resolve();

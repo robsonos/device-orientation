@@ -1,4 +1,4 @@
-import { DecimalPipe, JsonPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
@@ -53,5 +53,22 @@ export class HomePage {
     }
 
     return 'UNKNOWN';
+  });
+
+  magneticFieldAccuracy = computed(() => {
+    const accuracy = this.deviceOrientation()?.magneticFieldAccuracy;
+
+    switch (accuracy) {
+      case -1:
+        return 'UNCALIBRATED';
+      case 0:
+        return 'LOW';
+      case 1:
+        return 'MEDIUM';
+      case 2:
+        return 'HIGH';
+      default:
+        return 'UNKNOWN';
+    }
   });
 }
