@@ -52,7 +52,7 @@ public class DeviceOrientation: CAPPlugin {
         let frequency = call.getString("frequency", "default")
         motionManager.deviceMotionUpdateInterval = getUpdateInterval(from: frequency)
 
-        motionManager.startDeviceMotionUpdates(using: .xMagneticNorthZVertical, to: .main) { [weak self] motion, error in
+        motionManager.startDeviceMotionUpdates(using: .xTrueNorthZVertical, to: .main) { [weak self] motion, error in
             guard let self = self else { return }
             if let error = error {
                 for (_, savedCall) in self.watchingCalls {
@@ -68,16 +68,34 @@ public class DeviceOrientation: CAPPlugin {
             let attitude = motion.attitude
             let quaternion = attitude.quaternion
             let azimuthDegrees = self.toDegrees(attitude.yaw)
-            let normalizedAzimuth = azimuthDegrees < 0 ? azimuthDegrees + 360 : azimuthDegrees
+            // Convert from CCW (iOS) to CW (Android/Compass) and normalize to [0, 360]
+            let cwAzimuth = (360.0 - azimuthDegrees).truncatingRemainder(dividingBy: 360.0)
+            // Adjust for the 90 degree offset between iOS (X=North) and Android (Y=North) reference frames
+            let adjustedAzimuth = (cwAzimuth - 90.0 + 360.0).truncatingRemainder(dividingBy: 360.0)
+
+            // iOS Pitch is positive when device tilts up (Top Up).
+            // Android/Web Pitch is positive when device tilts down (Top Down).
+            // We invert iOS Pitch to match Android/Web.
+            let pitch = -self.toDegrees(attitude.pitch)
+            let roll = self.toDegrees(attitude.roll)
+
+            // Rotate quaternion by +90 degrees around Z to match Android reference frame
+            // q_new = q_old * q_z90
+            // q_z90 = [0, 0, sin(45), cos(45)] = [0, 0, 0.7071, 0.7071]
+            let k = sqrt(0.5) // 0.7071...
+            let qw = k * (quaternion.w - quaternion.z)
+            let qx = k * (quaternion.x + quaternion.y)
+            let qy = k * (quaternion.y - quaternion.x)
+            let qz = k * (quaternion.w + quaternion.z)
 
             let data: [String: Any] = [
                 "attitude": [
-                    "quaternion": [quaternion.x, quaternion.y, quaternion.z, quaternion.w],
+                    "quaternion": [qy, -qx, -qz, -qw],
                 ],
                 "orientation": [
-                    "azimuth": normalizedAzimuth,
-                    "pitch": self.toDegrees(attitude.pitch),
-                    "roll": self.toDegrees(attitude.roll),
+                    "azimuth": adjustedAzimuth,
+                    "pitch": pitch,
+                    "roll": roll,
                 ],
             ]
             for (_, savedCall) in self.watchingCalls {

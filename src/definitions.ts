@@ -13,26 +13,32 @@ export type Quaternion = [qx: number, qy: number, qz: number, qw: number];
 export interface Orientation {
   /**
    * The angle of rotation about the -z axis, in degrees. This value represents
-   * the angle between the device's y-axis and the magnetic north pole.
-   * On Android, the range is [-180, 180]. On iOS (native and web), the range is [0, 360].
+   * the angle between the device's y-axis and the north pole.
+   * The value is normalized to [0, 360] and is Clockwise (Compass style).
+   * - **iOS**: Relative to True North (requires location permissions).
+   * - **Android**: Relative to True North (if location is available), otherwise Magnetic North.
    *
    * @since 7.0.0
    */
   azimuth: number;
+
   /**
    * The angle of rotation about the -x axis, in degrees. This value represents
    * the angle between a plane parallel to the device's screen and a plane
    * parallel to the ground.
-   * On Android, the range is [-90, 90].
+   * On Android and iOS, the range is [-90, 90].
+   * Positive values indicate the top of the device is pointing down (towards the ground).
+   * Negative values indicate the top of the device is pointing up (towards the sky).
    *
    * @since 7.0.0
    */
   pitch: number;
+
   /**
    * The angle of rotation about the y-axis, in degrees. This value represents
    * the angle between a plane perpendicular to the device's screen and a
    * plane perpendicular to the ground.
-   * On Android, the range is [-180, 180].
+   * On Android and iOS, the range is [-180, 180].
    *
    * @since 7.0.0
    */
@@ -47,12 +53,13 @@ export interface Orientation {
  */
 export interface FusedOrientation {
   /**
-   * The estimated heading of the device in degrees from [0, 360), aiming for
-   * True North when possible.
+   * The estimated heading of the device in degrees from [0, 360). Relative to True North
+   * if location is available), otherwise Magnetic North.
    *
    * @since 7.0.0
    */
   heading: number;
+
   /**
    * The estimated error in the reported heading in degrees, from [0, 180].
    * This represents half the error cone.
@@ -64,6 +71,8 @@ export interface FusedOrientation {
 
 /**
  * The raw attitude of the device represented as a quaternion.
+ * On both Android and iOS, the quaternion represents the rotation from the
+ * East-North-Up (ENU) world reference frame to the device frame.
  *
  * @platform android, ios
  * @since 7.0.0
@@ -89,6 +98,7 @@ export interface DeviceOrientationData {
    * @since 7.0.0
    */
   orientation: Orientation;
+
   /**
    * The fused heading data, which includes corrections for True North.
    *

@@ -37,9 +37,13 @@ export class DeviceOrientationWeb extends WebPlugin implements DeviceOrientation
   private startWatch(callback: DeviceOrientationWatchCallback): string {
     const watchId = this.generateWatchId();
     const handler = (event: DeviceOrientationEvent) => {
+      const alpha = event.alpha ?? 0;
+      // Convert from CCW (Web Standard) to CW (Android/Compass)
+      const cwAzimuth = (360 - alpha) % 360;
+
       const deviceOrientation: DeviceOrientationData = {
         orientation: {
-          azimuth: event.alpha ?? 0,
+          azimuth: cwAzimuth,
           pitch: event.beta ?? 0,
           roll: event.gamma ?? 0,
         },
