@@ -34,16 +34,17 @@
     <ion-item-divider>
       <ion-label>Fused Orientation</ion-label>
     </ion-item-divider>
+    @if (deviceOrientationData.fused) {
     <ion-item>
       <ion-label>
         <h2>Heading</h2>
-        <p>{{ deviceOrientationData.fused?.heading | number : '1.2-2' }}</p>
+        <p>{{ deviceOrientationData.fused.heading | number : '1.2-2' }}</p>
       </ion-label>
     </ion-item>
     <ion-item>
       <ion-label>
         <h2>Heading Error</h2>
-        <p>{{ deviceOrientationData.fused?.headingError | number : '1.2-2' }}</p>
+        <p>{{ deviceOrientationData.fused.headingError | number : '1.2-2' }}</p>
       </ion-label>
     </ion-item>
     <ion-item>
@@ -52,6 +53,20 @@
         <p>{{ headingAccuracy() }}</p>
       </ion-label>
     </ion-item>
+    } @else if (deviceOrientationData.magneticFieldAccuracy !== undefined) {
+    <ion-item>
+      <ion-label>
+        <h2>Magnetic Field Accuracy</h2>
+        <p>{{ magneticFieldAccuracy() }}</p>
+      </ion-label>
+    </ion-item>
+    } @else {
+    <ion-item>
+      <ion-label>
+        <h2>No Fused/Accuracy Data</h2>
+      </ion-label>
+    </ion-item>
+    }
 
     <ion-item-divider>
       <ion-label>Attitude</ion-label>
