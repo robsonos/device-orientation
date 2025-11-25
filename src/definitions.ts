@@ -106,6 +106,19 @@ export interface DeviceOrientationData {
    * @since 7.0.0
    */
   fused?: FusedOrientation;
+
+  /**
+   * The accuracy of the magnetic field calibration.
+   * -1: Uncalibrated
+   * 0: Low
+   * 1: Medium
+   * 2: High
+   *
+   * @platform ios
+   * @since 7.2.0
+   */
+  magneticFieldAccuracy?: number;
+
   /**
    * The raw attitude data as a quaternion.
    *

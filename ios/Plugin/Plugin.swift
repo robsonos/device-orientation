@@ -97,6 +97,7 @@ public class DeviceOrientation: CAPPlugin {
                     "pitch": pitch,
                     "roll": roll,
                 ],
+                "magneticFieldAccuracy": motion.magneticField.accuracy.rawValue,
             ]
             for (_, savedCall) in self.watchingCalls {
                 savedCall.resolve(data)
