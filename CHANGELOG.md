@@ -1,3 +1,22 @@
+# [7.2.0](https://github.com/robsonos/device-orientation/compare/v7.1.0...v7.2.0) (2025-11-25)
+
+
+### Bug Fixes :bug:
+
+* correct azimuth calculation and improve callback handling ([1baeb4c](https://github.com/robsonos/device-orientation/commit/1baeb4ca368088922257e297d7686c66472147db))
+* fix linting issues ([6e8e99b](https://github.com/robsonos/device-orientation/commit/6e8e99b339143d80f652e8e02ff4ba7854f7765b))
+
+
+* Merge pull request #4 from robsonos/dev ([5711d7c](https://github.com/robsonos/device-orientation/commit/5711d7c92b05782246d7e88e1080edb243dc1ac7)), closes [#4](https://github.com/robsonos/device-orientation/issues/4)
+
+
+### Features :sparkles:
+
+* add magnetic field accuracy to device orientation data and update iOS permissions in README ([7def71e](https://github.com/robsonos/device-orientation/commit/7def71e2a26c36fbbe79f8aa885a39436651c7a0))
+* enhance device orientation handling with True North adjustments and location permissions ([af86ef2](https://github.com/robsonos/device-orientation/commit/af86ef294940058b6b2bff8644489b9edfaa91c1))
+* update dependencies ([40e0145](https://github.com/robsonos/device-orientation/commit/40e0145c0ce944909058c13dbc46013e032e0748))
+* update example ([6ee5387](https://github.com/robsonos/device-orientation/commit/6ee53879d0e78ae13457c964a49de4e7a6a79d7e))
+
 # [7.1.0](https://github.com/robsonos/device-orientation/compare/v7.0.0...v7.1.0) (2025-10-04)
 
 
