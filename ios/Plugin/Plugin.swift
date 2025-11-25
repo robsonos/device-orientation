@@ -82,15 +82,15 @@ public class DeviceOrientation: CAPPlugin {
             // Rotate quaternion by +90 degrees around Z to match Android reference frame
             // q_new = q_old * q_z90
             // q_z90 = [0, 0, sin(45), cos(45)] = [0, 0, 0.7071, 0.7071]
-            let k = sqrt(0.5) // 0.7071...
-            let qw = k * (quaternion.w - quaternion.z)
-            let qx = k * (quaternion.x + quaternion.y)
-            let qy = k * (quaternion.y - quaternion.x)
-            let qz = k * (quaternion.w + quaternion.z)
+            let rotationConstant = sqrt(0.5) // 0.7071...
+            let rotatedW = rotationConstant * (quaternion.w - quaternion.z)
+            let rotatedX = rotationConstant * (quaternion.x + quaternion.y)
+            let rotatedY = rotationConstant * (quaternion.y - quaternion.x)
+            let rotatedZ = rotationConstant * (quaternion.w + quaternion.z)
 
             let data: [String: Any] = [
                 "attitude": [
-                    "quaternion": [qy, -qx, -qz, -qw],
+                    "quaternion": [rotatedY, -rotatedX, -rotatedZ, -rotatedW],
                 ],
                 "orientation": [
                     "azimuth": adjustedAzimuth,
