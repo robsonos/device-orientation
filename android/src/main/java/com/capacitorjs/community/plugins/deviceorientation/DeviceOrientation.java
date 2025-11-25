@@ -70,7 +70,10 @@ public class DeviceOrientation {
         SensorManager.getRotationMatrixFromVector(rotationMatrix, attitude);
         SensorManager.getOrientation(rotationMatrix, orientationAngles);
 
-        orientationData.put("azimuth", Math.toDegrees(orientationAngles[0]));
+        double azimuth = Math.toDegrees(orientationAngles[0]);
+        azimuth = (azimuth < 0) ? azimuth + 360 : azimuth;
+
+        orientationData.put("azimuth", azimuth);
         orientationData.put("pitch", Math.toDegrees(orientationAngles[1]));
         orientationData.put("roll", Math.toDegrees(orientationAngles[2]));
         data.put("orientation", orientationData);
